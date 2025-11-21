@@ -4,7 +4,7 @@ Spring Boot REST API for storing notes in MongoDB. Pick the workflow that suits 
 
 ## Docker Compose
 
-- Requirement: Docker Engine 24+ (Compose plugin included).
+- Requirement: Docker installed localy.
 - Command:
   ```
   docker compose up --build
@@ -20,4 +20,4 @@ Spring Boot REST API for storing notes in MongoDB. Pick the workflow that suits 
    SPRING_DATA_MONGODB_URI=mongodb://localhost:27017/noteapp
    ```
 3. Start the app with `./gradlew bootRun` and visit http://localhost:8080.
-4. Rrun tests via `./gradlew test`.
+4. Run tests via `./gradlew test`.
