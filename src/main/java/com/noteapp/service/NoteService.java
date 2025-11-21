@@ -2,6 +2,8 @@ package com.noteapp.service;
 
 import com.noteapp.dto.CreateNoteRequest;
 import com.noteapp.dto.NoteDto;
+import com.noteapp.dto.NoteStatsEntry;
+import com.noteapp.dto.NoteStatsResponse;
 import com.noteapp.dto.NoteTextResponse;
 import com.noteapp.dto.UpdateNoteRequest;
 import com.noteapp.exception.NotFoundException;
@@ -12,9 +14,17 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.time.Instant;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -65,6 +75,12 @@ public class NoteService {
         return noteMapper.toDto(note);
     }
 
+    public NoteStatsResponse getStats(String id) {
+        Note note = findById(id);
+        List<NoteStatsEntry> entries = calculateStats(note.getText());
+
+        return new NoteStatsResponse(id, entries);
+    }
 
 
     private Note findById(String id) {
@@ -80,5 +96,18 @@ public class NoteService {
             log.error(e.getMessage());
             throw new IllegalArgumentException("Note saving error", e);
         }
+    }
+
+    private List<NoteStatsEntry> calculateStats(String text) {
+        if (!StringUtils.hasText(text)) return List.of();
+
+        return Arrays.stream(text.toLowerCase(Locale.ROOT).split("\\W+"))
+                .filter(StringUtils::hasText)
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+                .entrySet().stream()
+                .sorted(Map.Entry.<String, Long>comparingByValue(Comparator.reverseOrder())
+                        .thenComparing(Map.Entry.comparingByKey()))
+                .map(e -> new NoteStatsEntry(e.getKey(), e.getValue()))
+                .toList();
     }
 }

@@ -2,6 +2,7 @@ package com.noteapp.controller;
 
 import com.noteapp.dto.CreateNoteRequest;
 import com.noteapp.dto.NoteDto;
+import com.noteapp.dto.NoteStatsResponse;
 import com.noteapp.dto.NoteTextResponse;
 import com.noteapp.dto.UpdateNoteRequest;
 import com.noteapp.service.NoteService;
@@ -50,6 +51,12 @@ public class NoteController {
         return ResponseEntity.ok(noteTextResponse);
     }
 
+    @GetMapping("/{id}/stats")
+    public ResponseEntity<NoteStatsResponse> stats(@PathVariable String id) {
+        NoteStatsResponse statsResponse = noteService.getStats(id);
+
+        return ResponseEntity.ok(statsResponse);
+    }
 
     @PatchMapping("/{id}")
     public ResponseEntity<NoteDto> updateNote(
