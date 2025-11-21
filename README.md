@@ -4,7 +4,7 @@ Spring Boot REST API for storing notes in MongoDB. Pick the workflow that suits 
 
 ## Docker Compose
 
-- Requirement: Docker Engine 24+ (Compose plugin included).
+- Requirement: Docker installed localy.
 - Command:
   ```
   docker compose up --build
