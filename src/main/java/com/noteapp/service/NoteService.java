@@ -2,6 +2,7 @@ package com.noteapp.service;
 
 import com.noteapp.dto.CreateNoteRequest;
 import com.noteapp.dto.NoteDto;
+import com.noteapp.dto.NoteTextResponse;
 import com.noteapp.dto.UpdateNoteRequest;
 import com.noteapp.exception.NotFoundException;
 import com.noteapp.mapper.NoteMapper;
@@ -35,6 +36,12 @@ public class NoteService {
     }
 
 
+    public NoteTextResponse getText(String id) {
+        Note note = findById(id);
+
+        return new NoteTextResponse(note.getText());
+    }
+
     public NoteDto updateNote(UpdateNoteRequest dto, String id) {
         Note note = findById(id);
 
@@ -52,6 +59,13 @@ public class NoteService {
 
         noteRepository.delete(note);
     }
+
+    public NoteDto getNoteDtoById(String id) {
+        Note note = findById(id);
+        return noteMapper.toDto(note);
+    }
+
+
 
     private Note findById(String id) {
         return noteRepository.findById(id)

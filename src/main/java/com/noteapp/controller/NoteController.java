@@ -2,6 +2,7 @@ package com.noteapp.controller;
 
 import com.noteapp.dto.CreateNoteRequest;
 import com.noteapp.dto.NoteDto;
+import com.noteapp.dto.NoteTextResponse;
 import com.noteapp.dto.UpdateNoteRequest;
 import com.noteapp.service.NoteService;
 import jakarta.validation.Valid;
@@ -29,6 +30,24 @@ public class NoteController {
         NoteDto noteResponse = noteService.createNote(body);
 
         return ResponseEntity.ok(noteResponse);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<NoteDto> getNote(
+            @PathVariable String id
+    ) {
+        NoteDto note = noteService.getNoteDtoById(id);
+
+        return ResponseEntity.ok(note);
+    }
+
+    @GetMapping("/{id}/text")
+    public ResponseEntity<NoteTextResponse> getNoteText(
+            @PathVariable String id
+    ) {
+        NoteTextResponse noteTextResponse = noteService.getText(id);
+
+        return ResponseEntity.ok(noteTextResponse);
     }
 
 
