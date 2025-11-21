@@ -87,7 +87,12 @@ public class NoteService {
     }
 
     public Page<NotePreviewDto> getNotePreviews(NoteParams params, Pageable pageable) {
-        Page<Note> notePage = noteRepository.findByTagsIn(params.tags(), pageable);
+        Page<Note> notePage;
+        if (params.tags() == null || params.tags().isEmpty()) {
+            notePage = noteRepository.findAll(pageable);
+        } else {
+            notePage = noteRepository.findByTagsIn(params.tags(), pageable);
+        }
 
         List<NotePreviewDto> notePreviewDtoList = noteMapper.toPreviewDtoList(notePage);
 
