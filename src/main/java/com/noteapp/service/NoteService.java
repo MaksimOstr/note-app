@@ -2,6 +2,8 @@ package com.noteapp.service;
 
 import com.noteapp.dto.CreateNoteRequest;
 import com.noteapp.dto.NoteDto;
+import com.noteapp.dto.NoteParams;
+import com.noteapp.dto.NotePreviewDto;
 import com.noteapp.dto.NoteStatsEntry;
 import com.noteapp.dto.NoteStatsResponse;
 import com.noteapp.dto.NoteTextResponse;
@@ -13,6 +15,9 @@ import com.noteapp.repository.NoteRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -38,18 +43,17 @@ public class NoteService {
         note.setTitle(dto.title());
         note.setText(dto.text());
         note.setTags(dto.tags());
-        note.setCreatedAt(Instant.now());
+        note.setCreatedDate(Instant.now());
 
         Note savedNote = saveNote(note);
 
         return noteMapper.toDto(savedNote);
     }
 
-
     public NoteTextResponse getText(String id) {
         Note note = findById(id);
 
-        return new NoteTextResponse(note.getText());
+        return noteMapper.toNoteTextResponse(note);
     }
 
     public NoteDto updateNote(UpdateNoteRequest dto, String id) {
@@ -82,12 +86,20 @@ public class NoteService {
         return new NoteStatsResponse(id, entries);
     }
 
+    public Page<NotePreviewDto> getNotePreviews(NoteParams params, Pageable pageable) {
+        Page<Note> notePage = noteRepository.findByTagsIn(params.tags(), pageable);
+
+        List<NotePreviewDto> notePreviewDtoList = noteMapper.toPreviewDtoList(notePage);
+
+        return new PageImpl<>(notePreviewDtoList, pageable, notePage.getTotalElements());
+    }
+
+
 
     private Note findById(String id) {
         return noteRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Note not found"));
     }
-
 
     private Note saveNote(Note note) {
         try {

@@ -6,6 +6,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -19,7 +20,7 @@ public class Note {
 
     private String text;
 
-    private List<NoteTagEnum> tags;
+    private List<NoteTagEnum> tags = new ArrayList<>();
 
-    private Instant createdAt;
+    private Instant createdDate;
 }

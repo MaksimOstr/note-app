@@ -2,12 +2,18 @@ package com.noteapp.controller;
 
 import com.noteapp.dto.CreateNoteRequest;
 import com.noteapp.dto.NoteDto;
+import com.noteapp.dto.NoteParams;
+import com.noteapp.dto.NotePreviewDto;
 import com.noteapp.dto.NoteStatsResponse;
 import com.noteapp.dto.NoteTextResponse;
 import com.noteapp.dto.UpdateNoteRequest;
 import com.noteapp.service.NoteService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,7 +22,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/notes")
@@ -41,6 +50,21 @@ public class NoteController {
 
         return ResponseEntity.ok(note);
     }
+
+    @GetMapping
+    public ResponseEntity<Page<NotePreviewDto>> getAllNotes(
+            NoteParams params,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Sort sort = Sort.by(Sort.Direction.DESC, "createdDate");
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<NotePreviewDto> previewDtoPage = noteService.getNotePreviews(params, pageable);
+
+        return ResponseEntity.ok(previewDtoPage);
+    }
+
 
     @GetMapping("/{id}/text")
     public ResponseEntity<NoteTextResponse> getNoteText(

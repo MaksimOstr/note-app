@@ -10,6 +10,6 @@ public record NoteDto(
         String title,
         String text,
         List<NoteTagEnum> tags,
-        Instant createdAt
+        Instant createdDate
 ) {
 }
