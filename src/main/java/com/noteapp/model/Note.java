@@ -2,7 +2,6 @@ package com.noteapp.model;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -22,6 +21,5 @@ public class Note {
 
     private List<NoteTagEnum> tags;
 
-    @CreatedDate
-    private Instant createdDate;
+    private Instant createdAt;
 }

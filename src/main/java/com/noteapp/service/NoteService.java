@@ -1,8 +1,9 @@
 package com.noteapp.service;
 
-import com.mongodb.MongoWriteException;
 import com.noteapp.dto.CreateNoteRequest;
-import com.noteapp.dto.CreateNoteResponse;
+import com.noteapp.dto.NoteDto;
+import com.noteapp.dto.UpdateNoteRequest;
+import com.noteapp.exception.NotFoundException;
 import com.noteapp.mapper.NoteMapper;
 import com.noteapp.model.Note;
 import com.noteapp.repository.NoteRepository;
@@ -11,6 +12,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.util.Optional;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -18,15 +22,40 @@ public class NoteService {
     private final NoteRepository noteRepository;
     private final NoteMapper noteMapper;
 
-    public CreateNoteResponse createNote(CreateNoteRequest dto) {
+    public NoteDto createNote(CreateNoteRequest dto) {
         Note note = new Note();
         note.setTitle(dto.title());
         note.setText(dto.text());
         note.setTags(dto.tags());
+        note.setCreatedAt(Instant.now());
 
         Note savedNote = saveNote(note);
 
-        return noteMapper.toCreateNoteResponse(savedNote);
+        return noteMapper.toDto(savedNote);
+    }
+
+
+    public NoteDto updateNote(UpdateNoteRequest dto, String id) {
+        Note note = findById(id);
+
+        Optional.ofNullable(dto.title()).ifPresent(note::setTitle);
+        Optional.ofNullable(dto.text()).ifPresent(note::setText);
+        Optional.ofNullable(dto.tags()).ifPresent(note::setTags);
+
+        Note updatedNote = saveNote(note);
+
+        return noteMapper.toDto(updatedNote);
+    }
+
+    public void deleteNote(String id) {
+        Note note = findById(id);
+
+        noteRepository.delete(note);
+    }
+
+    private Note findById(String id) {
+        return noteRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Note not found"));
     }
 
 
